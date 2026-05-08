@@ -16,12 +16,6 @@ class TransactionPinPage extends StatefulWidget {
 }
 
 class _TransactionPinPageState extends State<TransactionPinPage> {
-  static final List<TextInputFormatter> _pinInputFormatters =
-      <TextInputFormatter>[
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(4),
-      ];
-
   final TextEditingController _oldPinController = TextEditingController();
   final TextEditingController _newPinController = TextEditingController();
   final TextEditingController _confirmPinController = TextEditingController();
@@ -337,22 +331,39 @@ class _TransactionPinPageState extends State<TransactionPinPage> {
 
   InputDecoration _decoration({
     required String label,
+    required bool isDark,
     String? errorText,
     String? hint,
   }) {
+    final Color fillColor = isDark ? const Color(0xFF171B2B) : Colors.white;
+    final Color borderColor =
+        isDark ? const Color(0xFF4A5168) : const Color(0xFFD1D5DB);
+    final Color labelColor =
+        isDark ? const Color(0xFFE5E7EB) : const Color(0xFF4B5563);
+
     return InputDecoration(
       labelText: label,
       hintText: hint,
       errorText: errorText,
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: fillColor,
+      labelStyle: TextStyle(
+        color: labelColor,
+        fontSize: 12.5,
+        fontWeight: FontWeight.w600,
+      ),
+      hintStyle: TextStyle(
+        color: labelColor.withValues(alpha: 0.58),
+        fontSize: 12.5,
+        fontWeight: FontWeight.w500,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: ptsDataSoftBorder),
+        borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: ptsDataSoftBorder),
+        borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
@@ -472,41 +483,29 @@ class _TransactionPinPageState extends State<TransactionPinPage> {
                 ),
                 const SizedBox(height: 12),
                 if (_profile.hasTransactionPin) ...<Widget>[
-                  TextField(
+                  _PinBoxInput(
                     controller: _oldPinController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: _pinInputFormatters,
-                    obscureText: true,
-                    decoration: _decoration(
-                      label: 'Current PIN',
-                      hint: 'Enter current PIN',
-                      errorText: _oldPinError,
-                    ),
+                    label: 'Current PIN',
+                    errorText: _oldPinError,
+                    isDark: isDark,
+                    onChanged: () => setState(() => _oldPinError = null),
                   ),
                   const SizedBox(height: 12),
                 ],
-                TextField(
+                _PinBoxInput(
                   controller: _newPinController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: _pinInputFormatters,
-                  obscureText: true,
-                  decoration: _decoration(
-                    label: 'New PIN',
-                    hint: 'Enter new 4-digit PIN',
-                    errorText: _newPinError,
-                  ),
+                  label: 'New PIN',
+                  errorText: _newPinError,
+                  isDark: isDark,
+                  onChanged: () => setState(() => _newPinError = null),
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                _PinBoxInput(
                   controller: _confirmPinController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: _pinInputFormatters,
-                  obscureText: true,
-                  decoration: _decoration(
-                    label: 'Confirm PIN',
-                    hint: 'Confirm new PIN',
-                    errorText: _confirmPinError,
-                  ),
+                  label: 'Confirm PIN',
+                  errorText: _confirmPinError,
+                  isDark: isDark,
+                  onChanged: () => setState(() => _confirmPinError = null),
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
@@ -566,35 +565,39 @@ class _TransactionPinPageState extends State<TransactionPinPage> {
                     TextField(
                       controller: _resetPasswordController,
                       obscureText: true,
+                      onChanged:
+                          (_) => setState(() => _resetPasswordError = null),
+                      style: TextStyle(
+                        color:
+                            isDark
+                                ? const Color(0xFFF8FAFC)
+                                : const Color(0xFF111827),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                       decoration: _decoration(
                         label: 'Account Password',
+                        isDark: isDark,
                         hint: 'Enter your account password',
                         errorText: _resetPasswordError,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    _PinBoxInput(
                       controller: _resetNewPinController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: _pinInputFormatters,
-                      obscureText: true,
-                      decoration: _decoration(
-                        label: 'New PIN',
-                        hint: 'Enter new PIN',
-                        errorText: _resetNewPinError,
-                      ),
+                      label: 'New PIN',
+                      errorText: _resetNewPinError,
+                      isDark: isDark,
+                      onChanged: () => setState(() => _resetNewPinError = null),
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    _PinBoxInput(
                       controller: _resetConfirmPinController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: _pinInputFormatters,
-                      obscureText: true,
-                      decoration: _decoration(
-                        label: 'Confirm PIN',
-                        hint: 'Confirm new PIN',
-                        errorText: _resetConfirmPinError,
-                      ),
+                      label: 'Confirm PIN',
+                      errorText: _resetConfirmPinError,
+                      isDark: isDark,
+                      onChanged:
+                          () => setState(() => _resetConfirmPinError = null),
                     ),
                     const SizedBox(height: 16),
                     FilledButton(
@@ -617,6 +620,213 @@ class _TransactionPinPageState extends State<TransactionPinPage> {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _PinBoxInput extends StatefulWidget {
+  const _PinBoxInput({
+    required this.controller,
+    required this.label,
+    required this.isDark,
+    this.errorText,
+    this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final bool isDark;
+  final String? errorText;
+  final VoidCallback? onChanged;
+
+  @override
+  State<_PinBoxInput> createState() => _PinBoxInputState();
+}
+
+class _PinBoxInputState extends State<_PinBoxInput> {
+  static final List<TextInputFormatter> _inputFormatters = <TextInputFormatter>[
+    FilteringTextInputFormatter.digitsOnly,
+    LengthLimitingTextInputFormatter(4),
+  ];
+
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_handleControllerChanged);
+    _focusNode.addListener(_handleFocusChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant _PinBoxInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_handleControllerChanged);
+      widget.controller.addListener(_handleControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleControllerChanged);
+    _focusNode
+      ..removeListener(_handleFocusChanged)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _handleControllerChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _handleFocusChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String value = widget.controller.text;
+    final bool hasError = widget.errorText != null;
+    final Color labelColor =
+        widget.isDark ? const Color(0xFFF8FAFC) : const Color(0xFF111827);
+    final Color mutedText =
+        widget.isDark ? ptsDataDarkMuted : const Color(0xFF4B5563);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          widget.label,
+          style: TextStyle(
+            color: labelColor,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Stack(
+          children: <Widget>[
+            Row(
+              children: List<Widget>.generate(4, (int index) {
+                final bool filled = index < value.length;
+                final bool active =
+                    _focusNode.hasFocus &&
+                    (index == value.length.clamp(0, 3) ||
+                        (filled && index == 3));
+
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: index == 3 ? 0 : 9),
+                    child: _PinDigitBox(
+                      filled: filled,
+                      active: active,
+                      hasError: hasError,
+                      isDark: widget.isDark,
+                    ),
+                  ),
+                );
+              }),
+            ),
+            Positioned.fill(
+              child: TextField(
+                controller: widget.controller,
+                focusNode: _focusNode,
+                keyboardType: TextInputType.number,
+                inputFormatters: _inputFormatters,
+                maxLength: 4,
+                obscureText: true,
+                showCursor: false,
+                enableInteractiveSelection: false,
+                onChanged: (_) => widget.onChanged?.call(),
+                style: const TextStyle(color: Colors.transparent, fontSize: 1),
+                cursorColor: Colors.transparent,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  counterText: '',
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (hasError) ...<Widget>[
+          const SizedBox(height: 7),
+          Text(
+            widget.errorText!,
+            style: const TextStyle(
+              color: Color(0xFFDC2626),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ] else ...<Widget>[
+          const SizedBox(height: 7),
+          Text(
+            'Enter 4 digits',
+            style: TextStyle(
+              color: mutedText,
+              fontSize: 10.8,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _PinDigitBox extends StatelessWidget {
+  const _PinDigitBox({
+    required this.filled,
+    required this.active,
+    required this.hasError,
+    required this.isDark,
+  });
+
+  final bool filled;
+  final bool active;
+  final bool hasError;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color borderColor =
+        hasError
+            ? const Color(0xFFDC2626)
+            : (active
+                ? ptsDataPrimary
+                : (isDark ? const Color(0xFF4A5168) : const Color(0xFFD1D5DB)));
+    final Color fillColor = isDark ? const Color(0xFF171B2B) : Colors.white;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      height: 52,
+      decoration: BoxDecoration(
+        color: fillColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: active ? 1.4 : 1),
+      ),
+      child: Center(
+        child: AnimatedOpacity(
+          opacity: filled ? 1 : 0,
+          duration: const Duration(milliseconds: 120),
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: const BoxDecoration(
+              color: ptsDataPrimary,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -42,22 +42,11 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loadQuickLoginAvailability() async {
     final bool canUseQuickLogin =
         await AppSessionService.instance.canUseQuickLogin();
-    final String? apiToken = await AppSessionService.instance.getApiToken();
     if (!mounted) {
       return;
     }
 
     setState(() => _canUseQuickLogin = canUseQuickLogin);
-
-    if (canUseQuickLogin && (apiToken == null || apiToken.isEmpty)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-
-        Navigator.of(context).pushReplacementNamed(AppRoutes.quickLogin);
-      });
-    }
   }
 
   Future<void> _submit() async {
