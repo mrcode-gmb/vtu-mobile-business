@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" spellcheck="false" translate="no">
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="PTS DATA mobile application.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="PTS DATA">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>PTS DATA</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #171925;
+      spellcheck: false;
+    }
+
+    ::spelling-error,
+    ::grammar-error {
+      text-decoration: none !important;
+      background: transparent;
+    }
+
+    flt-semantics,
+    flt-semantics-host,
+    flt-glass-pane,
+    [flt-semantics],
+    [aria-label],
+    [role="text"] {
+      text-decoration: none !important;
+      -webkit-text-decoration: none !important;
+      text-decoration-line: none !important;
+      text-decoration-color: transparent !important;
+      text-decoration-thickness: 0 !important;
+      text-shadow: none !important;
+    }
+  </style>
+</head>
+<body spellcheck="false" translate="no">
+  <script>
+    document.documentElement.setAttribute('spellcheck', 'false');
+    document.documentElement.setAttribute('translate', 'no');
+    document.body.setAttribute('spellcheck', 'false');
+    document.body.setAttribute('translate', 'no');
+
+    const disableBrowserTextDecorations = (root) => {
+      if (!root || !root.querySelectorAll) {
+        return;
+      }
+
+      root.querySelectorAll('*').forEach((element) => {
+        element.setAttribute('spellcheck', 'false');
+        element.setAttribute('translate', 'no');
+      });
+    };
+
+    disableBrowserTextDecorations(document);
+
+    new MutationObserver(() => {
+      disableBrowserTextDecorations(document.body);
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
